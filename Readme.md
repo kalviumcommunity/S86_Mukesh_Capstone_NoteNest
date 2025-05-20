@@ -38,7 +38,9 @@
 
 ##  Capstone Journey – Day-by-Day Plan
 
- Day 1 - Setup GitHub Repo.
+- Day 1 - Setup GitHub Repo.
+- Day 2 - Desiging home page.
+
 ---
 
 ##  Future Enhancements
