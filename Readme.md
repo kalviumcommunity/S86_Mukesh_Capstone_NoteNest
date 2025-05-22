@@ -40,6 +40,8 @@
 
 - Day 1 - Setup GitHub Repo.
 - Day 2 - Desiging home page.
+- Day 3 - Implementing POST API method.
+- Day 4 - Implementing GET API method.
 
 ---
 
