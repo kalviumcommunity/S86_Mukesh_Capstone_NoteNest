@@ -25,7 +25,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     const newNote = new Note({ title, content, file });
     await newNote.save();
 
-    res.status(201).json({message: "New Note added sucessfully",newNote});
+    res.status(201).json({ message: "New Note added successfully", newNote });
   } catch (err) {
     res.status(500).json({ message: 'Error creating note', error: err });
   }
@@ -49,6 +49,22 @@ router.get('/:id', async (req, res) => {
     res.json(note);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching note', error: err });
+  }
+});
+
+// PUT: Update note
+router.put('/:id', upload.single('file'), async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const file = req.file ? req.file.filename : undefined;
+
+    const updateData = { title, content };
+    if (file) updateData.file = file;
+
+    const updatedNote = await Note.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json(updatedNote);
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating note', error: err });
   }
 });
 
