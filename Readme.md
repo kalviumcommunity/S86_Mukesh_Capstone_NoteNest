@@ -43,6 +43,8 @@
 - Day 3 - Implementing POST API method.
 - Day 4 - Implementing GET API method.
 - Day 5 - Implementing PUT API method.
+- Day 6 - Implementing DELETE API method and Creating Mongoose model schema.
+
 
 ---
 
