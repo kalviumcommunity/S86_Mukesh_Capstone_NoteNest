@@ -25,7 +25,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     const newNote = new Note({ title, content, file });
     await newNote.save();
 
-    res.status(201).json({ message: "New Note added successfully", newNote });
+    res.status(201).json(newNote);
   } catch (err) {
     res.status(500).json({ message: 'Error creating note', error: err });
   }
@@ -65,6 +65,16 @@ router.put('/:id', upload.single('file'), async (req, res) => {
     res.json(updatedNote);
   } catch (err) {
     res.status(500).json({ message: 'Error updating note', error: err });
+  }
+});
+
+// DELETE: Remove note
+router.delete('/:id', async (req, res) => {
+  try {
+    await Note.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Note deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting note', error: err });
   }
 });
 
