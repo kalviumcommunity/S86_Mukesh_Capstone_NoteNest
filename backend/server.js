@@ -1,21 +1,26 @@
 const express = require('express');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
+const folderRoutes = require('./routes/folderRoutes');
 require('dotenv').config({ path: './config/.env' });
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(express.json());
 
-// Connect to DB
+// DB Connection
 connectDB();
 
 // Routes
-app.use('/notes', noteRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/folders', folderRoutes);
 
-// Start server
-app.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
-);
+// Root route
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
