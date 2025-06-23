@@ -1,17 +1,19 @@
-const express = require('express');
+// backend/routes/noteRoutes.js
+
+const express = require("express");
 const router = express.Router();
+const auth = require("../middleware/auth");
+const upload = require("../middleware/upload");
 const {
   createNote,
-  getNotes,
   getNotesByFolder,
+  deleteNote,
   updateNote,
-  deleteNote
-} = require('../controllers/noteController');
+} = require("../controllers/noteController");
 
-router.post('/', createNote);
-router.get('/', getNotes);
-router.get('/folder/:folderId', getNotesByFolder);
-router.put('/:id', updateNote);
-router.delete('/:id', deleteNote);
+router.post("/", auth, upload.single("file"), createNote);
+router.get("/folder/:folderId", auth, getNotesByFolder);
+router.delete("/:noteId", auth, deleteNote);
+router.put("/:noteId", auth, upload.single("file"), updateNote);
 
 module.exports = router;

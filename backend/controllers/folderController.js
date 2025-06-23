@@ -1,11 +1,12 @@
 const Folder = require('../models/folderSchema');
-const Note = require('../models/noteSchema'); // ✅ Import Note model
+const Note = require('../models/noteSchema'); // Add this line
+
 
 // Create folder
 const createFolder = async (req, res) => {
   const { name } = req.body;
   try {
-    const folder = new Folder({ name });
+    const folder = new Folder({ name, user: req.user.id });
     const savedFolder = await folder.save();
     res.status(201).json(savedFolder);
   } catch (err) {
@@ -13,56 +14,70 @@ const createFolder = async (req, res) => {
   }
 };
 
-// Get all folders
-const getAllFolders = async (req, res) => {
+// Get all folders of the logged-in user with item count
+const getFolders = async (req, res) => {
   try {
-    const folders = await Folder.find();
-    res.json(folders);
+    const folders = await Folder.find({ user: req.user.id }).sort({ createdAt: -1 });
+
+    const foldersWithItemCount = await Promise.all(
+      folders.map(async (folder) => {
+        const count = await Note.countDocuments({ folder: folder._id });
+        return {
+          ...folder.toObject(),
+          noteCount: count,
+        };
+      })
+    );
+
+    res.status(200).json(foldersWithItemCount);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Update folder
+
+// ✅ Update folder name
 const updateFolder = async (req, res) => {
-  const folderId = req.params.id;
+  const { id } = req.params;
   const { name } = req.body;
+
   try {
-    const updatedFolder = await Folder.findByIdAndUpdate(
-      folderId,
+    const folder = await Folder.findOneAndUpdate(
+      { _id: id, user: req.user.id },
       { name },
       { new: true }
     );
-    if (!updatedFolder) {
-      return res.status(404).json({ message: 'Folder not found' });
+
+    if (!folder) {
+      return res.status(404).json({ error: "Folder not found or unauthorized" });
     }
-    res.json(updatedFolder);
+
+    res.status(200).json(folder);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
-// Delete folder and its notes
+// ✅ Delete folder
 const deleteFolder = async (req, res) => {
-  const folderId = req.params.id;
-  try {
-    // ✅ Step 1: Delete all notes inside this folder
-    await Note.deleteMany({ folder: folderId });
+  const { id } = req.params;
 
-    // ✅ Step 2: Delete the folder itself
-    const deletedFolder = await Folder.findByIdAndDelete(folderId);
-    if (!deletedFolder) {
-      return res.status(404).json({ message: 'Folder not found' });
+  try {
+    const folder = await Folder.findOneAndDelete({ _id: id, user: req.user.id });
+
+    if (!folder) {
+      return res.status(404).json({ error: "Folder not found or unauthorized" });
     }
-    res.json({ message: 'Folder and its notes deleted successfully' });
+
+    res.status(200).json({ message: "Folder deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 
 module.exports = {
   createFolder,
-  getAllFolders,
+  getFolders,
   updateFolder,
-  deleteFolder
+  deleteFolder,
 };
