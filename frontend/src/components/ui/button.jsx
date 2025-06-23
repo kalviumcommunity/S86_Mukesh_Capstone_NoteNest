@@ -1,34 +1,23 @@
-import React from "react";
-import clsx from "clsx"; // optional, for class merging
-
-export const Button = ({
-  children,
-  variant = "default",
-  size = "default",
-  className = "",
-  ...props
-}) => {
-  const baseStyles =
-    "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none";
-
-  const variants = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
-    ghost: "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-300",
+const Button = ({ children, className, onClick, variant, size }) => {
+    const baseStyles = "py-2 px-4 rounded-md focus:outline-none";
+    const variantStyles = variant === "outline" 
+      ? "border border-gray-600 text-gray-600 hover:bg-gray-100"
+      : "bg-primary text-white hover:bg-primary-dark";
+    const sizeStyles = size === "sm" ? "text-sm" : "text-lg";
+    
+    return (
+      <button 
+        className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`} 
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    );
   };
+  
+  export default Button;
 
-  const sizes = {
-    default: "h-10 px-4 py-2",
-    icon: "h-10 w-10 p-2",
-  };
 
-  return (
-    <button
-      className={clsx(baseStyles, variants[variant], sizes[size], className)}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
 
-export default Button;
+  
+  
