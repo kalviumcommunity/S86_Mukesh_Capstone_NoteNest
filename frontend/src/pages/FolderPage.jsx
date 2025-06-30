@@ -15,7 +15,7 @@ const FolderPage = () => {
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/api/notes/folder/${folderId}`, {
+      const response = await axios.get(`https://s86-mukesh-capstone-notenest-un0g.onrender.com/api/notes/folder/${folderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(response.data);
@@ -34,7 +34,7 @@ const FolderPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/notes/${noteId}`, {
+      await axios.delete(`https://s86-mukesh-capstone-notenest-un0g.onrender.com/api/notes/${noteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchNotes();
@@ -53,7 +53,7 @@ const FolderPage = () => {
       }
 
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/notes/${updated._id}`, formData, {
+      await axios.put(`https://s86-mukesh-capstone-notenest-un0g.onrender.com/api/notes/${updated._id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -103,7 +103,7 @@ const FolderPage = () => {
                 <p className="text-sm text-muted-foreground">{note.content}</p>
                 {note.file && (
                   <a
-                    href={`http://localhost:5000/uploads/${note.file}`}
+                    href={`https://s86-mukesh-capstone-notenest-un0g.onrender.com/uploads/${note.file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 underline mt-2 inline-block"

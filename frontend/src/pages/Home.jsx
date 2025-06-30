@@ -17,7 +17,7 @@ const Home = () => {
   const fetchFolders = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/folders/all", {
+      const response = await axios.get("https://s86-mukesh-capstone-notenest-un0g.onrender.com/api/folders/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFolders(response.data);
@@ -34,7 +34,7 @@ const Home = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/folders",
+        "https://s86-mukesh-capstone-notenest-un0g.onrender.com/api/folders",
         { name },
         {
           headers: { Authorization: `Bearer ${token}` },
