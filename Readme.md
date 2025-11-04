@@ -120,4 +120,6 @@
 Thank you for checking out **NoteNest**!
 
 
-**Backend deploy link:** *https://s86-mukesh-capstone-notenest-un0g.onrender.com*
+**Backend deploy link:** https://s86-mukesh-capstone-notenest-un0g.onrender.com
+
+**Frontend deploy link:** https://capstone-notenest.netlify.app/

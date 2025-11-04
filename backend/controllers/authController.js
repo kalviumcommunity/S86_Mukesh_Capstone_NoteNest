@@ -1,3 +1,30 @@
+// Get current user profile
+exports.getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
+};
+// Update user profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, bio, avatar } = req.body;
+    const update = {};
+    if (name) update.name = name;
+    if (bio !== undefined) update.bio = bio;
+    if (avatar !== undefined) update.avatar = avatar;
+    const user = await User.findByIdAndUpdate(userId, update, { new: true });
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
+};
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -37,6 +64,13 @@ exports.login = async (req, res) => {
     if (!user)
       return res.status(400).json({ msg: 'Invalid email or password' });
 
+    // Check if user signed up with Google and doesn't have a password
+    if (user.authProvider === 'google' && !user.password) {
+      return res.status(400).json({ 
+        msg: 'This account was created with Google. Please use the "Continue with Google" option.' 
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ msg: 'Invalid email or password' });
@@ -50,7 +84,9 @@ exports.login = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        bio: user.bio,
+        avatar: user.avatar
       }
     });
   } catch (err) {

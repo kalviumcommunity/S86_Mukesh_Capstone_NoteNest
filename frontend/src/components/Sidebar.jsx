@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Folder, File, Code, FolderGit2 } from "lucide-react"; // Added FolderGit2 icon
+import { Folder, File, Code, FolderGit2, LogOut } from "lucide-react"; // Added LogOut icon
 import { useNavigate } from "react-router-dom";
 import CreateNoteModal from "./CreateNoteModal";
 
@@ -59,6 +59,19 @@ const Sidebar = ({ isOpen, onCreateFolder }) => {
               </button>
             ))}
           </nav>
+        </div>
+        {/* Logout Button at the bottom */}
+        <div className="absolute bottom-8 left-0 w-full flex justify-center">
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-gray-100 text-red-600 transition border border-gray-200 shadow"
+            title="Logout"
+          >
+            <LogOut className="h-6 w-6" />
+          </button>
         </div>
       </div>
 

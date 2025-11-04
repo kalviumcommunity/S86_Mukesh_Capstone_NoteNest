@@ -4,13 +4,17 @@ import { useState } from "react";
 
 const CreateFolderModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
   const handleCreate = () => {
-    if (name.trim()) {
-      onCreate(name);
-      setName("");
-      onClose();
+    if (!name.trim()) {
+      setError("Please enter a folder name.");
+      return;
     }
+    setError("");
+    onCreate(name);
+    setName("");
+    onClose();
   };
 
   return (
@@ -20,6 +24,9 @@ const CreateFolderModal = ({ isOpen, onClose, onCreate }) => {
         <Dialog.Panel className="w-full max-w-md rounded bg-white p-6 shadow-xl">
           <Dialog.Title className="text-lg font-semibold mb-2">Create Folder</Dialog.Title>
           <p className="text-sm text-muted-foreground mb-4">Enter a name for your new folder</p>
+          {error && (
+            <div className="text-red-600 text-sm mb-2">{error}</div>
+          )}
           <input
             type="text"
             value={name}

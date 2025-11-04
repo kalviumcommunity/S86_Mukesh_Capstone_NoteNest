@@ -1,30 +1,14 @@
 import { Folder, Trash2 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-const FolderGrid = ({ refreshFlag }) => {
-  const [folders, setFolders] = useState([]);
+const FolderGrid = ({ folders, setFolders }) => {
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchFolders();
-  }, [refreshFlag]); // Re-fetch when parent changes flag
-
-  const fetchFolders = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/folders/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFolders(response.data);
-    } catch (err) {
-      console.error("Error fetching folders:", err);
-    }
-  };
 
   const handleFolderClick = (folderId) => {
     navigate(`/folder/${folderId}`);
@@ -41,7 +25,7 @@ const FolderGrid = ({ refreshFlag }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `http://localhost:5000/api/folders/${folderId}`,
+  `${BACKEND_URL}/api/folders/${folderId}`,
         { name: editName },
         {
           headers: {
@@ -63,7 +47,7 @@ const FolderGrid = ({ refreshFlag }) => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/folders/${id}`, {
+  await axios.delete(`${BACKEND_URL}/api/folders/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFolders((prev) => prev.filter((folder) => folder._id !== id));
@@ -71,6 +55,15 @@ const FolderGrid = ({ refreshFlag }) => {
       console.error("Error deleting folder:", err);
     }
   };
+
+  if (!Array.isArray(folders) || folders.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center mt-16 text-center">
+        <p className="text-lg font-semibold mb-2">No folders found</p>
+        <p className="text-muted-foreground mb-4">Create a folder to add files in it.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
@@ -112,7 +105,19 @@ const FolderGrid = ({ refreshFlag }) => {
           </CardContent>
           <div className="flex justify-between items-center p-2">
             <div className="text-xs text-muted-foreground">
-              Updated {new Date(folder.updatedAt).toLocaleString()}
+              {(() => {
+                const updated = new Date(folder.updatedAt);
+                const now = new Date();
+                const diffMs = now - updated;
+                const diffSec = Math.floor(diffMs / 1000);
+                const diffMin = Math.floor(diffSec / 60);
+                const diffHr = Math.floor(diffMin / 60);
+                const isToday = updated.toDateString() === now.toDateString();
+                if (diffMin < 1) return "Updated just now";
+                if (diffHr < 1) return `Updated ${diffMin} min ago`;
+                if (isToday) return `Updated ${diffHr} hr ago`;
+                return `Updated on ${updated.toLocaleDateString()}`;
+              })()}
             </div>
             <div>
               <button onClick={() => handleDelete(folder._id)} title="Delete Folder">

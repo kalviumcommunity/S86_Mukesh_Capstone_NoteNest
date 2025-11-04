@@ -11,9 +11,9 @@ const {
   updateNote,
 } = require("../controllers/noteController");
 
-router.post("/", auth, upload.single("file"), createNote);
+router.post("/", auth, upload.array("file"), createNote);
 router.get("/folder/:folderId", auth, getNotesByFolder);
 router.delete("/:noteId", auth, deleteNote);
-router.put("/:noteId", auth, upload.single("file"), updateNote);
+router.put("/:noteId", auth, upload.array("file"), updateNote);
 
 module.exports = router;

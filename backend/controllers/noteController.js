@@ -6,14 +6,17 @@ const Note = require("../models/noteSchema");
 const createNote = async (req, res) => {
   try {
     const { title, content, folder } = req.body;
-    const file = req.file ? req.file.filename : null;
+    let files = [];
+    if (req.files && req.files.length > 0) {
+      files = req.files.map(f => f.filename);
+    }
 
     const note = new Note({
       title,
       content,
       folder,
       user: req.user.id,
-      file,
+      files,
     });
 
     const savedNote = await note.save();
@@ -62,34 +65,40 @@ const deleteNote = async (req, res) => {
   }
 };
 
-// Update Note with optional file add/remove
+// Update Note with optional file add/remove (supports multiple files)
 const updateNote = async (req, res) => {
   try {
-    const { title, content, removeFile } = req.body;
+    const { title, content, removeFiles } = req.body;
     const noteId = req.params.noteId;
 
     const note = await Note.findOne({ _id: noteId, user: req.user.id });
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    // Remove old file if requested
-    if (removeFile === "true" && note.file) {
-      const filePath = path.join(__dirname, "../uploads", note.file);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    // Remove files if requested (expects array of filenames)
+    let filesToRemove = [];
+    try {
+      if (removeFiles) {
+        const parsed = JSON.parse(removeFiles);
+        if (Array.isArray(parsed)) filesToRemove = parsed;
       }
-      note.file = null;
+    } catch (e) {}
+    if (filesToRemove.length > 0) {
+      note.files = note.files.filter(f => {
+        if (filesToRemove.includes(f)) {
+          const filePath = path.join(__dirname, "../uploads", f);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+          return false;
+        }
+        return true;
+      });
     }
 
-    // If a new file is uploaded
-    if (req.file) {
-      // Delete previous file
-      if (note.file) {
-        const oldPath = path.join(__dirname, "../uploads", note.file);
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
-      }
-      note.file = req.file.filename;
+    // If new files are uploaded (req.files)
+    if (req.files && req.files.length > 0) {
+      const newFiles = req.files.map(f => f.filename);
+      note.files = [...note.files, ...newFiles];
     }
 
     note.title = title || note.title;
